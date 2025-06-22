@@ -22,8 +22,8 @@
   "Test the ox-nippou--parse-journal function with simple content."
   (let ((org-content "* 22日(日)\n** Tasks\n*** TODO Task 1\n*** DONE Task 2"))
     (should (equal (ox-nippou--parse-journal org-content)
-                   '((:title "Task 1" :todo "TODO")
-                     (:title "Task 2" :todo "DONE"))))))
+                   '((:title "Task 1" :todo "TODO" :category nil)
+                     (:title "Task 2" :todo "DONE" :category nil))))))
 
 (ert-deftest test-ox-nippou--parse-journal-with-category ()
   "Test the ox-nippou--parse-journal function with category."
