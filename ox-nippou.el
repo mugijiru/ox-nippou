@@ -98,8 +98,12 @@ This function returns a list of tasks with their titles and todo keywords."
     (org-mode)
     (let* ((org-data (org-element-parse-buffer 'element))
            (tasks-container (ox-nippou--find-journal-tasks-container org-data))
-           (children (ox-nippou--extract-child-headlines tasks-container)))
-      (seq-map #'ox-nippou--parse-journal-task children))))
+           (children (ox-nippou--extract-child-headlines tasks-container))
+           (filtered-children
+            (seq-filter (lambda (child)
+                          (null (org-element-property :IGNORE_NIPPOU child)))
+                        children)))
+      (seq-map #'ox-nippou--parse-journal-task filtered-children))))
 
 (defun ox-nippou--categorize-tasks (tasks)
   "Categorize TASKS based on their todo state using `loop` macro.
