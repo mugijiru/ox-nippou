@@ -46,6 +46,11 @@
   :type '((alist :key-type string :value-type (repeat string)))
   :group 'ox-nippou)
 
+(defcustom ox-nippou-no-tasks-string "No tasks"
+  "String to display when there are no tasks in the nippou."
+  :type 'string
+  :group 'ox-nippou)
+
 (defconst ox-nippou-journal-tasks-heading "Tasks"
   "Heading for tasks in the journal.")
 
@@ -155,7 +160,7 @@ This function returns a hash table where keys are todo states.
                              (mapconcat
                               'ox-nippou--generate-text-from-task
                               tasks "\n"))
-                   (concat heading prefix "No tasks"))))
+                   (concat heading prefix ox-nippou-no-tasks-string))))
              category-ordered-tasks "\n\n"))
 
 ;;; autoloads
