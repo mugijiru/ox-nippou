@@ -126,6 +126,9 @@ This function returns a hash table where keys are todo states.
   (mapconcat (lambda (one-category-tasks)
                (let* ((key (car one-category-tasks))
                       (heading (concat "# " key "\n\n"))
+                      (prefix (if (string= key "done")
+                                  "- [x] "
+                                "- [ ] "))
                       (tasks (nth 1 one-category-tasks)))
                  (if tasks
                      (concat heading
@@ -137,9 +140,9 @@ This function returns a hash table where keys are todo states.
                                        (text (if category
                                                 (format "%s: %s" category title)
                                               title)))
-                                  (concat "- [ ] " text)))
+                                  (concat prefix text)))
                               tasks "\n"))
-                   (concat heading "- [ ] No tasks"))))
+                   (concat heading prefix "No tasks"))))
              category-ordered-tasks "\n\n"))
 
 ;;; autoloads

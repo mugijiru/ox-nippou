@@ -68,7 +68,7 @@
     (let ((result (ox-nippou--generate-nippou-content categorized-tasks)))
       (should (string= "# done
 
-- [ ] Task 2
+- [x] Task 2
 
 # doing
 
@@ -92,7 +92,7 @@
     (let ((result (ox-nippou--generate-nippou-content categorized-tasks)))
       (should (string= "# done
 
-- [ ] No tasks
+- [x] No tasks
 
 # doing
 
@@ -116,7 +116,7 @@
     (let ((result (ox-nippou--generate-nippou-content categorized-tasks)))
       (should (string= "# done
 
-- [ ] Foo: Task 2
+- [x] Foo: Task 2
 
 # doing
 
@@ -150,8 +150,8 @@
         (should (string= nippou-content
                          "# done
 
-- [ ] completed task 2
-- [ ] completed task
+- [x] completed task 2
+- [x] completed task
 
 # doing
 
