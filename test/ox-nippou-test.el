@@ -25,6 +25,19 @@
                    '((:title "Task 1" :todo "TODO")
                      (:title "Task 2" :todo "DONE"))))))
 
+(ert-deftest test-ox-nippou--parse-journal-with-category ()
+  "Test the ox-nippou--parse-journal function with category."
+  (let ((org-content "* 22日(日)
+** Tasks
+*** TODO Task 1
+:PROPERTIES:
+:CATEGORY: category1
+:END:
+*** DONE Task 2"))
+    (should (equal (ox-nippou--parse-journal org-content)
+                   '((:title "Task 1" :todo "TODO" :category "category1")
+                     (:title "Task 2" :todo "DONE" :category nil))))))
+
 (ert-deftest test-ox-nippou--categorize-tasks ()
   "Test the ox-nippou--categorize-tasks function with simple tasks."
   (let* ((tasks '((:title "Task 1" :todo "TODO")

@@ -69,8 +69,9 @@
 (defun ox-nippou--parse-journal-task (headline)
   "Parse a task from a org HEADLINE."
   (let* ((title (org-element-property :title headline))
+         (category (org-element-property :CATEGORY headline))
          (todo (org-element-property :todo-keyword headline)))
-    (list :title title :todo (or todo "TODO"))))
+    (list :title title :todo (or todo "TODO") :category category)))
 
 (defun ox-nippou--extract-child-headlines (element)
   "Extract child headlines from ELEMENT."
