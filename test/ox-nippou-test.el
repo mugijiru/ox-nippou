@@ -55,7 +55,6 @@
                              '((:title "Task 3" :todo "DOING" :category "Bar")
                                (:title "Task 4" :todo "WAITING" :category nil))))))
 
-
 (ert-deftest test-ox-nippou--generate-nippou-content ()
   "Test the ox-nippou--generate-nippou-content function with categorized tasks."
   (let* ((categorized-tasks)
@@ -102,6 +101,31 @@
 # todo
 
 - [ ] Task 1"
+                              result)))))
+
+(ert-deftest test-ox-nippou--generate-nippou-content-with-category ()
+  "Test the ox-nippou--generate-nippou-content function with categorized tasks."
+  (let* ((categorized-tasks)
+         (todo-tasks '((:title "Task 1" :todo "TODO" :category "Foo")))
+         (done-tasks '((:title "Task 2" :todo "DONE" :category "Foo")))
+         (doing-tasks '((:title "Task 3" :todo "DOING" :category "Bar")
+                        (:title "Task 4" :todo "WAITING" :category nil))))
+    (push `("todo" ,todo-tasks) categorized-tasks)
+    (push `("doing" ,doing-tasks) categorized-tasks)
+    (push `("done" ,done-tasks) categorized-tasks)
+    (let ((result (ox-nippou--generate-nippou-content categorized-tasks)))
+      (should (string= "# done
+
+- [ ] Foo: Task 2
+
+# doing
+
+- [ ] Bar: Task 3
+- [ ] Task 4
+
+# todo
+
+- [ ] Foo: Task 1"
                               result)))))
 
 (ert-deftest test-ox-nippou-export-as-nippou ()

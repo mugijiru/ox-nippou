@@ -131,7 +131,13 @@ This function returns a hash table where keys are todo states.
                      (concat heading
                              (mapconcat
                               (lambda (task)
-                                (format "- [ ] %s" (plist-get task :title)))
+                                (let* ((title (plist-get task :title))
+                                       (todo (plist-get task :todo))
+                                       (category (plist-get task :category))
+                                       (text (if category
+                                                (format "%s: %s" category title)
+                                              title)))
+                                  (concat "- [ ] " text)))
                               tasks "\n"))
                    (concat heading "- [ ] No tasks"))))
              category-ordered-tasks "\n\n"))
