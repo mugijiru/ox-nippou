@@ -26,6 +26,8 @@
 
 ;;; Code:
 
+(require 'cl)
+
 (defcustom ox-nippou-journal-directory "~/org/journal"
   "Directory where journal org files are stored."
   :type 'directory
