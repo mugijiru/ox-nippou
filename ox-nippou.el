@@ -134,5 +134,22 @@ This function returns a hash table where keys are todo states.
                    (concat heading "- [ ] No tasks"))))
              category-ordered-tasks "\n\n"))
 
+;;; autoloads
+(defun ox-nippou-export-as-nippou (&optional date)
+  "Export the journal tasks as nippou for DATE."
+  (interactive)
+  (let* ((journal-file (ox-nippou--identify-journal-file date))
+         (org-content (with-temp-buffer
+                        (insert-file-contents journal-file)
+                        (buffer-string)))
+         (tasks (ox-nippou--parse-journal org-content))
+         (categorized-tasks (ox-nippou--categorize-tasks tasks))
+         (nippou-content (ox-nippou--generate-nippou-content (nreverse categorized-tasks)))
+         (buffer (get-buffer-create (concat "*Org export nippou* " (format-time-string "%Y-%m-%d" (or date (current-time)))))))
+    (switch-to-buffer buffer)
+    (erase-buffer)
+    (insert nippou-content)
+    (markdown-view-mode)))
+
 (provide 'ox-nippou)
 ;;; ox-nippou.el ends here

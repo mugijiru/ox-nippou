@@ -89,3 +89,37 @@
 
 - [ ] Task 1"
                               result)))))
+
+(ert-deftest test-ox-nippou-export-as-nippou ()
+  "Test the ox-nippou--parse-journal-task function with a simple headline."
+  (let ((org-todo-keywords '("TODO" "DOING" "|" "DONE"))
+        (ox-nippou-journal-directory "/tmp")
+        (ox-nippou-journal-file-format "%Y%m%d.org"))
+    (with-temp-buffer
+      (insert "* 22日(日)
+** Tasks
+*** DONE completed task
+*** DONE completed task 2
+*** DOING progress task
+*** TODO new task
+** Other Headline
+")
+      (write-region (point-min) (point-max) "/tmp/20220122.org"))
+    (with-temp-buffer
+      (ox-nippou-export-as-nippou (encode-time 0 0 0 22 1 2022))
+      (text-mode)
+      (let ((nippou-content (buffer-substring-no-properties (point-min) (point-max))))
+        (should (string= nippou-content
+                         "# done
+
+- [ ] completed task 2
+- [ ] completed task
+
+# doing
+
+- [ ] progress task
+
+# todo
+
+- [ ] new task")))
+      (kill-current-buffer))))
