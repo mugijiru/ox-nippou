@@ -71,10 +71,10 @@
 (ert-deftest test-ox-nippou--generate-nippou-content ()
   "Test the ox-nippou--generate-nippou-content function with categorized tasks."
   (let* ((categorized-tasks)
-         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil)))
-         (done-tasks '((:title "Task 2" :todo "DONE" :category nil)))
-         (doing-tasks '((:title "Task 3" :todo "DOING" :category nil)
-                        (:title "Task 4" :todo "WAITING" :category nil))))
+         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil :pull-request "https://github.com/mugijiru/ox-nippou/pull/3")))
+         (done-tasks '((:title "Task 2" :todo "DONE" :category nil :pull-request nil)))
+         (doing-tasks '((:title "Task 3" :todo "DOING" :category nil :pull-request nil)
+                        (:title "Task 4" :todo "WAITING" :category nil :pull-request nil))))
     (push `("todo" ,todo-tasks) categorized-tasks)
     (push `("doing" ,doing-tasks) categorized-tasks)
     (push `("done" ,done-tasks) categorized-tasks)
@@ -90,7 +90,8 @@
 
 # todo
 
-- [ ] Task 1"
+- [ ] Task 1
+  - https://github.com/mugijiru/ox-nippou/pull/3"
                               result)))))
 
 (ert-deftest test-ox-nippou--generate-nippou-content-with-empty-state ()

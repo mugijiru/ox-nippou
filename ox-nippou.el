@@ -133,7 +133,9 @@ This function returns a hash table where keys are todo states.
     (concat "- ["
             (if (string= todo "DONE") "x" " ")
             "] "
-            text)))
+            text
+            (when-let ((pull-request (plist-get task :pull-request)))
+              (format "\n  - %s" pull-request)))))
 
 (defun ox-nippou--generate-nippou-content (category-ordered-tasks)
   "Generate nippou content from CATEGORY-ORDERD-TASKS."
