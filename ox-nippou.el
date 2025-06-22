@@ -26,7 +26,21 @@
 
 ;;; Code:
 
+(defcustom ox-nippou-journal-directory "~/org/journal"
+  "Directory where journal org files are stored."
+  :type 'directory
+  :group 'ox-nippou)
 
+(defcustom ox-nippou-journal-file-format "%Y%m%d.org"
+  "Format for journal org file names."
+  :type 'string
+  :group 'ox-nippou)
+
+(defun ox-nippou--identify-journal-file (&optional date)
+  "Find the journal org file for DATE."
+  (let ((date (or date (current-time)))
+        (file-name (format-time-string ox-nippou-journal-file-format date)))
+    (expand-file-name file-name ox-nippou-journal-directory)))
 
 (provide 'ox-nippou)
 ;;; ox-nippou.el ends here
