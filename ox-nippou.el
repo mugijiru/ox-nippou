@@ -70,8 +70,9 @@
   "Parse a task from a org HEADLINE."
   (let* ((title (org-element-property :title headline))
          (category (org-element-property :CATEGORY headline))
-         (todo (org-element-property :todo-keyword headline)))
-    (list :title title :todo (or todo "TODO") :category category)))
+         (todo (org-element-property :todo-keyword headline))
+         (pull-request (org-element-property :PULL_REQUEST headline)))
+    (list :title title :todo (or todo "TODO") :category category :pull-request pull-request)))
 
 (defun ox-nippou--extract-child-headlines (element)
   "Extract child headlines from ELEMENT."

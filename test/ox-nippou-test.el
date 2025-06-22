@@ -22,8 +22,8 @@
   "Test the ox-nippou--parse-journal function with simple content."
   (let ((org-content "* 22日(日)\n** Tasks\n*** TODO Task 1\n*** DONE Task 2"))
     (should (equal (ox-nippou--parse-journal org-content)
-                   '((:title "Task 1" :todo "TODO" :category nil)
-                     (:title "Task 2" :todo "DONE" :category nil))))))
+                   '((:title "Task 1" :todo "TODO" :category nil :pull-request nil)
+                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil))))))
 
 (ert-deftest test-ox-nippou--parse-journal-with-category ()
   "Test the ox-nippou--parse-journal function with category."
@@ -35,8 +35,21 @@
 :END:
 *** DONE Task 2"))
     (should (equal (ox-nippou--parse-journal org-content)
-                   '((:title "Task 1" :todo "TODO" :category "category1")
-                     (:title "Task 2" :todo "DONE" :category nil))))))
+                   '((:title "Task 1" :todo "TODO" :category "category1" :pull-request nil)
+                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil))))))
+
+(ert-deftest test-ox-nippou--parse-journal-with-pr-url ()
+  "Test the ox-nippou--parse-journal function with category."
+  (let ((org-content "* 22日(日)
+** Tasks
+*** TODO Task 1
+:PROPERTIES:
+:PULL_REQUEST: https://github.com/mugijiru/ox-nippou/pull/3
+:END:
+*** DONE Task 2"))
+    (should (equal (ox-nippou--parse-journal org-content)
+                   '((:title "Task 1" :todo "TODO" :category nil :pull-request "https://github.com/mugijiru/ox-nippou/pull/3")
+                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil))))))
 
 (ert-deftest test-ox-nippou--categorize-tasks ()
   "Test the ox-nippou--categorize-tasks function with simple tasks."
