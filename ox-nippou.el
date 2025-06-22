@@ -122,6 +122,19 @@ This function returns a hash table where keys are todo states.
                (push (list state tasks) result)))
     (nreverse result)))
 
+(defun ox-nippou--generate-text-from-task (task)
+  "Generate text representation of TASK."
+  (let* ((title (plist-get task :title))
+         (todo (plist-get task :todo))
+         (category (plist-get task :category))
+         (text (if category
+                   (format "%s: %s" category title)
+                 title)))
+    (concat "- ["
+            (if (string= todo "DONE") "x" " ")
+            "] "
+            text)))
+
 (defun ox-nippou--generate-nippou-content (category-ordered-tasks)
   "Generate nippou content from CATEGORY-ORDERD-TASKS."
   (mapconcat (lambda (one-category-tasks)
@@ -134,14 +147,7 @@ This function returns a hash table where keys are todo states.
                  (if tasks
                      (concat heading
                              (mapconcat
-                              (lambda (task)
-                                (let* ((title (plist-get task :title))
-                                       (todo (plist-get task :todo))
-                                       (category (plist-get task :category))
-                                       (text (if category
-                                                (format "%s: %s" category title)
-                                              title)))
-                                  (concat prefix text)))
+                              'ox-nippou--generate-text-from-task
                               tasks "\n"))
                    (concat heading prefix "No tasks"))))
              category-ordered-tasks "\n\n"))
