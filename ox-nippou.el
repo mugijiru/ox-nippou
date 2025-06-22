@@ -119,5 +119,19 @@ This function returns a hash table where keys are todo states.
                (push (list state tasks) result)))
     (nreverse result)))
 
+(defun ox-nippou--generate-nippou-content (category-ordered-tasks)
+  "Generate nippou content from CATEGORY-ORDERD-TASKS."
+  (mapconcat (lambda (one-category-tasks)
+               (let ((key (car one-category-tasks))
+                     (tasks (nth 1 one-category-tasks)))
+                 (if tasks
+                     (concat "# " key "\n\n"
+                             (mapconcat
+                              (lambda (task)
+                                (format "- [ ] %s" (plist-get task :title)))
+                              tasks "\n"))
+                   "- [ ] \n")))
+             category-ordered-tasks "\n\n"))
+
 (provide 'ox-nippou)
 ;;; ox-nippou.el ends here

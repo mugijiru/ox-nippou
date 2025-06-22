@@ -41,3 +41,28 @@
     (should (seq-set-equal-p (nth 1 (assoc "doing" result))
                              '((:title "Task 3" :todo "DOING")
                                (:title "Task 4" :todo "WAITING"))))))
+
+(ert-deftest test-ox-nippou--generate-nippou-content ()
+  "Test the ox-nippou--generate-nippou-content function with categorized tasks."
+  (let* ((categorized-tasks)
+         (todo-tasks '((:title "Task 1" :todo "TODO")))
+         (done-tasks '((:title "Task 2" :todo "DONE")))
+         (doing-tasks '((:title "Task 3" :todo "DOING")
+                        (:title "Task 4" :todo "WAITING"))))
+    (push `("todo" ,todo-tasks) categorized-tasks)
+    (push `("doing" ,doing-tasks) categorized-tasks)
+    (push `("done" ,done-tasks) categorized-tasks)
+    (let ((result (ox-nippou--generate-nippou-content categorized-tasks)))
+      (should (string= "# done
+
+- [ ] Task 2
+
+# doing
+
+- [ ] Task 3
+- [ ] Task 4
+
+# todo
+
+- [ ] Task 1"
+                              result)))))
