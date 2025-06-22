@@ -152,6 +152,9 @@
 ** Tasks
 *** DONE completed task
 *** DONE completed task 2
+:PROPERTIES:
+:PULL_REQUEST: https://github.com/mugijiru/ox-nippou/pull/3
+:END:
 *** DOING progress task
 *** TODO new task
 ** Other Headline
@@ -165,6 +168,7 @@
                          "# done
 
 - [x] completed task 2
+  - https://github.com/mugijiru/ox-nippou/pull/3
 - [x] completed task
 
 # doing
