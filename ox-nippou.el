@@ -36,6 +36,13 @@
   :type 'string
   :group 'ox-nippou)
 
+(defcustom ox-nippou-todo-state-mapping '(("todo" . '("TODO"))
+                                          ("doing" . '("DOING" "WAITING"))
+                                          ("done" . '("DONE")))
+  "Mapping of nippou states to org todo states."
+  :type '((alist :key-type string :value-type (repeat string)))
+  :group 'ox-nippou)
+
 (defconst ox-nippou-journal-tasks-heading "Tasks"
   "Heading for tasks in the journal.")
 
@@ -89,6 +96,27 @@ This function returns a list of tasks with their titles and todo keywords."
            (tasks-container (ox-nippou--find-journal-tasks-container org-data))
            (children (ox-nippou--extract-child-headlines tasks-container)))
       (seq-map #'ox-nippou--parse-journal-task children))))
+
+(defun ox-nippou--categorize-tasks (tasks)
+  "Categorize TASKS based on their todo state using `loop` macro.
+
+This function returns a hash table where keys are todo states.
+"
+  (let ((categorized-tasks (make-hash-table :test 'equal))
+        (result))
+    (loop for task in tasks
+          for todo = (plist-get task :todo)
+          for state = (or (car (cl-rassoc todo ox-nippou-todo-state-mapping
+                                          :test (lambda (target journal-states)
+                                                  (seq-contains-p (nth 1 journal-states) target))))
+                          "unknown")
+          do (puthash state
+                      (cons task (gethash state categorized-tasks))
+                      categorized-tasks))
+    (loop for state in (mapcar 'car ox-nippou-todo-state-mapping)
+          do (let ((tasks (gethash state categorized-tasks)))
+               (push (list state tasks) result)))
+    (nreverse result)))
 
 (provide 'ox-nippou)
 ;;; ox-nippou.el ends here
