@@ -40,20 +40,21 @@
 
 (ert-deftest test-ox-nippou--categorize-tasks ()
   "Test the ox-nippou--categorize-tasks function with simple tasks."
-  (let* ((tasks '((:title "Task 1" :todo "TODO")
-                  (:title "Task 2" :todo "DONE")
-                  (:title "Task 3" :todo "DOING")
-                  (:title "Task 4" :todo "WAITING")))
+  (let* ((tasks '((:title "Task 1" :todo "TODO" :category "Foo")
+                  (:title "Task 2" :todo "DONE" :category "Foo")
+                  (:title "Task 3" :todo "DOING" :category "Bar")
+                  (:title "Task 4" :todo "WAITING" :category nil)))
          (result (ox-nippou--categorize-tasks tasks)))
     (should (equal '("todo" "doing" "done")
                    (mapcar 'car result)))
     (should (seq-set-equal-p (nth 1 (assoc "todo" result))
-                             '((:title "Task 1" :todo "TODO"))))
+                             '((:title "Task 1" :todo "TODO" :category "Foo"))))
     (should (seq-set-equal-p (nth 1 (assoc "done" result))
-                             '((:title "Task 2" :todo "DONE"))))
+                             '((:title "Task 2" :todo "DONE" :category "Foo"))))
     (should (seq-set-equal-p (nth 1 (assoc "doing" result))
-                             '((:title "Task 3" :todo "DOING")
-                               (:title "Task 4" :todo "WAITING"))))))
+                             '((:title "Task 3" :todo "DOING" :category "Bar")
+                               (:title "Task 4" :todo "WAITING" :category nil))))))
+
 
 (ert-deftest test-ox-nippou--generate-nippou-content ()
   "Test the ox-nippou--generate-nippou-content function with categorized tasks."
