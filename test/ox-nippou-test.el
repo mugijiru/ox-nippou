@@ -66,3 +66,26 @@
 
 - [ ] Task 1"
                               result)))))
+
+(ert-deftest test-ox-nippou--generate-nippou-content-with-empty-state ()
+  "Test the ox-nippou--generate-nippou-content function with categorized tasks."
+  (let* ((categorized-tasks)
+         (done-tasks '())
+         (doing-tasks '())
+         (todo-tasks '((:title "Task 1" :todo "TODO"))))
+    (push `("todo" ,todo-tasks) categorized-tasks)
+    (push `("doing" ,doing-tasks) categorized-tasks)
+    (push `("done" ,done-tasks) categorized-tasks)
+    (let ((result (ox-nippou--generate-nippou-content categorized-tasks)))
+      (should (string= "# done
+
+- [ ] No tasks
+
+# doing
+
+- [ ] No tasks
+
+# todo
+
+- [ ] Task 1"
+                              result)))))
