@@ -6,7 +6,7 @@
 ;; URL: https://github.com/mugijiru/ox-nippou
 ;; Keywords: tools, docs
 ;; Version: 1.0.0
-;; Package-Requires: ((emacs "30.1") (org-mode "9.7"))
+;; Package-Requires: ((emacs "30.1") (org "9.7") (markdown-mode "2.5"))
 ;; Keywords: tools, docs
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'cl)
+(require 'markdown-mode)
 
 (defcustom ox-nippou-journal-directory "~/org/journal"
   "Directory where journal org files are stored."

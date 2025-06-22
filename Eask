@@ -12,6 +12,8 @@
 (script "test" "echo \"Error: no test specified\" && exit 1")
 
 (source "gnu")
+(source "melpa")
 
 (depends-on "emacs" "30.1")
-(depends-on "org-mode" "9.7")
+(depends-on "org" "9.7")
+(depends-on "markdown-mode" "2.5")
