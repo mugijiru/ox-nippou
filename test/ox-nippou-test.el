@@ -169,6 +169,10 @@
 :PULL_REQUEST: https://github.com/mugijiru/ox-nippou/pull/3
 :END:
 *** DOING progress task
+*** DOING ignored task
+:PROPERTIES:
+:IGNORE_NIPPOU: t
+:END:
 *** TODO new task
 ** Other Headline
 ")
