@@ -65,7 +65,6 @@
 
 (defun ox-nippou--parse-journal-task (headline)
   "Parse a task from a org HEADLINE."
-  (message "Parsing task: %s" (org-element-property :title headline))
   (let* ((title (org-element-property :title headline))
          (todo (org-element-property :todo-keyword headline)))
     (list :title title :todo (or todo "TODO"))))
