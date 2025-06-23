@@ -82,7 +82,7 @@
   (let* ((tasks '((:title "Task 1" :todo "TODO" :category "Foo" :pull-request "https://github.com/mugijiru/ox-nippou/pull/3" :document-url nil)
                   (:title "Task 2" :todo "DONE" :category "Foo" :pull-request nil :document-url "https://kibe.la/mugijiru/3")
                   (:title "Task 3" :todo "DOING" :category "Bar" :pull-request nil :document-url nil)
-                  (:title "Task 4" :todo "WAITING" :category nil :pull-request nil :document-url nil)))
+                  (:title "Task 4" :todo "DOING" :category nil :pull-request nil :document-url nil)))
          (result (ox-nippou--categorize-tasks tasks)))
     (should (equal '("todo" "doing" "done")
                    (mapcar 'car result)))
@@ -92,7 +92,7 @@
                              '((:title "Task 2" :todo "DONE" :category "Foo" :pull-request nil :document-url "https://kibe.la/mugijiru/3"))))
     (should (seq-set-equal-p (nth 1 (assoc "doing" result))
                              '((:title "Task 3" :todo "DOING" :category "Bar" :pull-request nil :document-url nil)
-                               (:title "Task 4" :todo "WAITING" :category nil :pull-request nil :document-url nil))))))
+                               (:title "Task 4" :todo "DOING" :category nil :pull-request nil :document-url nil))))))
 
 (ert-deftest test-ox-nippou--generate-nippou-content ()
   "Test the ox-nippou--generate-nippou-content function with categorized tasks."

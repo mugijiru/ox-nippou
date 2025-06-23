@@ -39,11 +39,11 @@
   :type 'string
   :group 'ox-nippou)
 
-(defcustom ox-nippou-todo-state-mapping '(("todo" . '("TODO"))
-                                          ("doing" . '("DOING" "WAITING"))
-                                          ("done" . '("DONE")))
+(defcustom ox-nippou-todo-state-mapping '(("todo"  . ("TODO"))
+                                          ("doing" . ("DOING"))
+                                          ("done"  . ("DONE")))
   "Mapping of nippou states to org todo states."
-  :type '((alist :key-type string :value-type (repeat string)))
+  :type '(alist :key-type string :value-type (repeat string))
   :group 'ox-nippou)
 
 (defcustom ox-nippou-no-tasks-string "No tasks"
@@ -123,7 +123,7 @@ This function returns a hash table where keys are todo states.
           for todo = (plist-get task :todo)
           for state = (or (car (cl-rassoc todo ox-nippou-todo-state-mapping
                                           :test (lambda (target journal-states)
-                                                  (seq-contains-p (nth 1 journal-states) target))))
+                                                  (seq-contains-p journal-states target))))
                           "unknown")
           do (puthash state
                       (cons task (gethash state categorized-tasks))
