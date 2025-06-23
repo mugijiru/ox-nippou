@@ -22,8 +22,8 @@
   "Test the ox-nippou--parse-journal function with simple content."
   (let ((org-content "* 22日(日)\n** Tasks\n*** TODO Task 1\n*** DONE Task 2"))
     (should (equal (ox-nippou--parse-journal org-content)
-                   '((:title "Task 1" :todo "TODO" :category nil :pull-request nil)
-                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil))))))
+                   '((:title "Task 1" :todo "TODO" :category nil :pull-request nil :document-url nil)
+                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url nil))))))
 
 (ert-deftest test-ox-nippou--parse-journal-with-category ()
   "Test the ox-nippou--parse-journal function with category."
@@ -35,8 +35,8 @@
 :END:
 *** DONE Task 2"))
     (should (equal (ox-nippou--parse-journal org-content)
-                   '((:title "Task 1" :todo "TODO" :category "category1" :pull-request nil)
-                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil))))))
+                   '((:title "Task 1" :todo "TODO" :category "category1" :pull-request nil :document-url nil)
+                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url nil))))))
 
 (ert-deftest test-ox-nippou--parse-journal-with-pr-url ()
   "Test the ox-nippou--parse-journal function with category."
@@ -48,8 +48,21 @@
 :END:
 *** DONE Task 2"))
     (should (equal (ox-nippou--parse-journal org-content)
-                   '((:title "Task 1" :todo "TODO" :category nil :pull-request "https://github.com/mugijiru/ox-nippou/pull/3")
-                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil))))))
+                   '((:title "Task 1" :todo "TODO" :category nil :pull-request "https://github.com/mugijiru/ox-nippou/pull/3" :document-url nil)
+                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url nil))))))
+
+(ert-deftest test-ox-nippou--parse-journal-with-document-url ()
+  "Test the ox-nippou--parse-journal function with document URL."
+  (let ((org-content "* 22日(日)
+** Tasks
+*** TODO Task 1
+:PROPERTIES:
+:DOCUMENT_URL: https://kibe.la/mugijiru/3
+:END:
+*** DONE Task 2"))
+    (should (equal (ox-nippou--parse-journal org-content)
+                   '((:title "Task 1" :todo "TODO" :category nil :pull-request nil :document-url "https://kibe.la/mugijiru/3")
+                     (:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url nil))))))
 
 (ert-deftest test-ox-nippou--parse-journal-with-ignore-nippou-property ()
   "Test the ox-nippou--parse-journal function with IGNORE_NIPPOU property."
@@ -61,33 +74,33 @@
 :END:
 *** DONE Task 2"))
     (should (equal (ox-nippou--parse-journal org-content)
-                   '((:title "Task 2" :todo "DONE" :category nil :pull-request nil))))))
+                   '((:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url nil))))))
 
 
 (ert-deftest test-ox-nippou--categorize-tasks ()
   "Test the ox-nippou--categorize-tasks function with simple tasks."
-  (let* ((tasks '((:title "Task 1" :todo "TODO" :category "Foo" :pull-request "https://github.com/mugijiru/ox-nippou/pull/3")
-                  (:title "Task 2" :todo "DONE" :category "Foo" :pull-request nil)
-                  (:title "Task 3" :todo "DOING" :category "Bar" :pull-request nil)
-                  (:title "Task 4" :todo "WAITING" :category nil :pull-request nil)))
+  (let* ((tasks '((:title "Task 1" :todo "TODO" :category "Foo" :pull-request "https://github.com/mugijiru/ox-nippou/pull/3" :document-url nil)
+                  (:title "Task 2" :todo "DONE" :category "Foo" :pull-request nil :document-url "https://kibe.la/mugijiru/3")
+                  (:title "Task 3" :todo "DOING" :category "Bar" :pull-request nil :document-url nil)
+                  (:title "Task 4" :todo "WAITING" :category nil :pull-request nil :document-url nil)))
          (result (ox-nippou--categorize-tasks tasks)))
     (should (equal '("todo" "doing" "done")
                    (mapcar 'car result)))
     (should (seq-set-equal-p (nth 1 (assoc "todo" result))
-                             '((:title "Task 1" :todo "TODO" :category "Foo" :pull-request "https://github.com/mugijiru/ox-nippou/pull/3"))))
+                             '((:title "Task 1" :todo "TODO" :category "Foo" :pull-request "https://github.com/mugijiru/ox-nippou/pull/3" :document-url nil))))
     (should (seq-set-equal-p (nth 1 (assoc "done" result))
-                             '((:title "Task 2" :todo "DONE" :category "Foo" :pull-request nil))))
+                             '((:title "Task 2" :todo "DONE" :category "Foo" :pull-request nil :document-url "https://kibe.la/mugijiru/3"))))
     (should (seq-set-equal-p (nth 1 (assoc "doing" result))
-                             '((:title "Task 3" :todo "DOING" :category "Bar" :pull-request nil)
-                               (:title "Task 4" :todo "WAITING" :category nil :pull-request nil))))))
+                             '((:title "Task 3" :todo "DOING" :category "Bar" :pull-request nil :document-url nil)
+                               (:title "Task 4" :todo "WAITING" :category nil :pull-request nil :document-url nil))))))
 
 (ert-deftest test-ox-nippou--generate-nippou-content ()
   "Test the ox-nippou--generate-nippou-content function with categorized tasks."
   (let* ((categorized-tasks)
-         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil :pull-request "https://github.com/mugijiru/ox-nippou/pull/3")))
-         (done-tasks '((:title "Task 2" :todo "DONE" :category nil :pull-request nil)))
-         (doing-tasks '((:title "Task 3" :todo "DOING" :category nil :pull-request nil)
-                        (:title "Task 4" :todo "WAITING" :category nil :pull-request nil))))
+         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil :pull-request "https://github.com/mugijiru/ox-nippou/pull/3" :document-url nil)))
+         (done-tasks '((:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url "https://kibe.la/mugijiru/3")))
+         (doing-tasks '((:title "Task 3" :todo "DOING" :category nil :pull-request nil :document-url nil)
+                        (:title "Task 4" :todo "WAITING" :category nil :pull-request nil :document-url nil))))
     (push `("todo" ,todo-tasks) categorized-tasks)
     (push `("doing" ,doing-tasks) categorized-tasks)
     (push `("done" ,done-tasks) categorized-tasks)
@@ -95,6 +108,7 @@
       (should (string= "# done
 
 - [x] Task 2
+  - https://kibe.la/mugijiru/3
 
 # doing
 
@@ -112,7 +126,7 @@
   (let* ((categorized-tasks)
          (done-tasks '())
          (doing-tasks '())
-         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil))))
+         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil :pull-request nil :document-url nil))))
     (push `("todo" ,todo-tasks) categorized-tasks)
     (push `("doing" ,doing-tasks) categorized-tasks)
     (push `("done" ,done-tasks) categorized-tasks)
@@ -136,7 +150,7 @@
          (done-tasks '())
          (doing-tasks '())
          (ox-nippou-no-tasks-string ":pear:")
-         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil))))
+         (todo-tasks '((:title "Task 1" :todo "TODO" :category nil :pull-request nil :document-url nil))))
     (push `("todo" ,todo-tasks) categorized-tasks)
     (push `("doing" ,doing-tasks) categorized-tasks)
     (push `("done" ,done-tasks) categorized-tasks)
@@ -157,10 +171,10 @@
 (ert-deftest test-ox-nippou--generate-nippou-content-with-category ()
   "Test the ox-nippou--generate-nippou-content function with categorized tasks."
   (let* ((categorized-tasks)
-         (todo-tasks '((:title "Task 1" :todo "TODO" :category "Foo")))
-         (done-tasks '((:title "Task 2" :todo "DONE" :category "Foo")))
-         (doing-tasks '((:title "Task 3" :todo "DOING" :category "Bar")
-                        (:title "Task 4" :todo "WAITING" :category nil))))
+         (todo-tasks '((:title "Task 1" :todo "TODO" :category "Foo" :pull-request nil :document-url nil)))
+         (done-tasks '((:title "Task 2" :todo "DONE" :category "Foo" :pull-request nil :document-url nil)))
+         (doing-tasks '((:title "Task 3" :todo "DOING" :category "Bar" :pull-request nil :document-url nil)
+                        (:title "Task 4" :todo "WAITING" :category nil :pull-request nil :document-url nil))))
     (push `("todo" ,todo-tasks) categorized-tasks)
     (push `("doing" ,doing-tasks) categorized-tasks)
     (push `("done" ,done-tasks) categorized-tasks)
@@ -193,6 +207,9 @@
 :PULL_REQUEST: https://github.com/mugijiru/ox-nippou/pull/3
 :END:
 *** DOING progress task
+:PROPERTIES:
+:DOCUMENT_URL: https://kibe.la/mugijiru/3
+:END:
 *** DOING ignored task
 :PROPERTIES:
 :IGNORE_NIPPOU: t
@@ -215,6 +232,7 @@
 # doing
 
 - [ ] progress task
+  - https://kibe.la/mugijiru/3
 
 # todo
 

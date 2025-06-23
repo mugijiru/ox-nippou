@@ -76,8 +76,10 @@
   (let* ((title (org-element-property :title headline))
          (category (org-element-property :CATEGORY headline))
          (todo (org-element-property :todo-keyword headline))
-         (pull-request (org-element-property :PULL_REQUEST headline)))
-    (list :title title :todo (or todo "TODO") :category category :pull-request pull-request)))
+         (pull-request (org-element-property :PULL_REQUEST headline))
+         (document-url (org-element-property :DOCUMENT_URL headline))
+         )
+    (list :title title :todo (or todo "TODO") :category category :pull-request pull-request :document-url document-url)))
 
 (defun ox-nippou--extract-child-headlines (element)
   "Extract child headlines from ELEMENT."
@@ -144,7 +146,9 @@ This function returns a hash table where keys are todo states.
             "] "
             text
             (when-let ((pull-request (plist-get task :pull-request)))
-              (format "\n  - %s" pull-request)))))
+              (format "\n  - %s" pull-request))
+            (when-let ((document-url (plist-get task :document-url)))
+              (format "\n  - %s" document-url)))))
 
 (defun ox-nippou--generate-nippou-content (category-ordered-tasks)
   "Generate nippou content from CATEGORY-ORDERD-TASKS."
