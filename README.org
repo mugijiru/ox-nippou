@@ -1,0 +1,79 @@
+* Project Name: ox-nippou
+ox-nippou is a tool for generating daily reports from Org-mode files.
+
+* Features
+- Automated Report Generation :: Converts Org-mode content into a well-structured daily report.
+- Customizable Output :: Supports customization of the report format to suit your needs.
+
+* Installation
+1. Clone the repository:
+   #+BEGIN_SRC shell
+   git clone https://github.com/mugijiru/ox-nippou.git
+   #+END_SRC
+2. Add the following to your Emacs configuration:
+   #+BEGIN_SRC emacs-lisp
+   (add-to-list 'load-path "/path/to/ox-nippou")
+   (require 'ox-nippou)
+   #+END_SRC
+
+* Usage
+1. Prepare your Org-mode file with tasks:
+   #+BEGIN_SRC org
+   ,* Tasks
+   ,** TODO Write README for ox-nippou
+   :PROPERTIES:
+   :CATEGORY: ox-nippou
+   :DOCUMENT_URL: https://github.com/mugijiru/ox-nippou
+   :END:
+   ,* DONE Fix bug in report generation
+   ,* DOING Creating new feature
+   #+END_SRC
+2. Export the daily report:
+   #+BEGIN_EXAMPLE
+   M-x ox-nippou-export-as-nippou
+   #+END_EXAMPLE
+3. Review the generated report.
+
+* Customization
+ox-nippou provides several customization options to tailor the output to your needs. Below are the key customizable variables:
+
++ ~ox-nippou-journal-directory~
+  #+BEGIN_QUOTE
+  Directory where journal Org files are stored.
+  Default: ~/org/journal
+  #+END_QUOTE
+  Example:
+  #+BEGIN_SRC emacs-lisp
+  (setopt ox-nippou-journal-directory "~/my-journal")
+  #+END_SRC
++ ~ox-nippou-journal-file-format~
+  #+BEGIN_QUOTE
+  Format for journal Org file names.
+  Default: "%Y%m%d.org"
+  #+END_QUOTE
+  Example:
+  #+BEGIN_SRC emacs-lisp
+  (setopt ox-nippou-journal-file-format "%Y-%m-%d.org")
+  #+END_SRC
++ ~ox-nippou-todo-state-mapping~
+  #+BEGIN_QUOTE
+  Mapping of nippou states to Org TODO states.
+  Default: '(("todo" . ("TODO")) ("doing" . ("DOING")) ("done" . ("DONE")))
+  #+END_QUOTE
+  Example:
+  #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
+  (setopt ox-nippou-todo-state-mapping
+          '(("todo" . ("Pending"))
+            ("doing" . ("Progress" "Reviewing"))
+            ("done" . ("Completed"))))
+  #+END_SRC
++ ~ox-nippou-no-tasks-string~
+  #+BEGIN_QUOTE
+  String to display when there are no tasks in the nippou.
+  Default: "No tasks"
+  #+END_QUOTE
+  Example:
+  #+BEGIN_SRC emacs-lisp
+  (setopt ox-nippou-no-tasks-string "Nothing to report today!")
+  #+END_SRC
