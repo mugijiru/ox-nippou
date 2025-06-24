@@ -167,7 +167,7 @@ This function returns a hash table where keys are todo states.
                    (concat heading prefix ox-nippou-no-tasks-string))))
              category-ordered-tasks "\n\n"))
 
-;;; autoloads
+;;;###autoload
 (defun ox-nippou-export-as-nippou (&optional date)
   "Export the journal tasks as nippou for DATE."
   (interactive)
