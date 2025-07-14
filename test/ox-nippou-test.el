@@ -76,6 +76,92 @@
     (should (equal (ox-nippou--parse-journal org-content)
                    '((:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url nil))))))
 
+(ert-deftest test-ox-nippou--parse-gcal ()
+  "Test the ox-nippou--parse-gcal function with simple content."
+  (let ((gcal-content "* テスト予定
+:PROPERTIES:
+:ETag: \"1234567890abcdef\"
+:LOCATION: Tokyo
+:calendar-id: foo@example.com
+:entry-id: 1234567890abcdef/foo@example.com
+:org-gcal-managed: gcal
+:END:
+:org-gcal:
+<2025-08-22 金 11:00-12:00>
+
+ここには予定の概要が出力されます
+
+:END:
+
+* DONE 別の予定
+:PROPERTIES:
+:ETag: \"2234567890abcdef\"
+:LOCATION: Tokyo
+:calendar-id: foo@example.com
+:entry-id: x234567890abcdef/foo@example.com
+:org-gcal-managed: gcal
+:END:
+:org-gcal:
+<2025-08-22 金 15:00-15:30>
+
+別の予定もありました
+
+:END:
+"))
+    (should (equal (ox-nippou--parse-gcal gcal-content "2025-08-22")
+                   '((:title "テスト予定" :todo "TODO" :category "会議など" :pull-request nil :document-url nil)
+                     (:title "別の予定" :todo "DONE" :category "会議など" :pull-request nil :document-url nil))))))
+
+(ert-deftest test-ox-nippou--parse-gcal-with-other-days-schedule ()
+  "Test the ox-nippou--parse-gcal function with simple content."
+  (let ((gcal-content "* テスト予定
+:PROPERTIES:
+:ETag: \"1234567890abcdef\"
+:LOCATION: Tokyo
+:calendar-id: foo@example.com
+:entry-id: 1234567890abcdef/foo@example.com
+:org-gcal-managed: gcal
+:END:
+:org-gcal:
+<2025-08-22 金 11:00-12:00>
+
+ここには予定の概要が出力されます
+
+:END:
+
+* DONE 前日の予定
+:PROPERTIES:
+:ETag: \"2234567890abcdef\"
+:LOCATION: Tokyo
+:calendar-id: foo@example.com
+:entry-id: x234567890abcdef/foo@example.com
+:org-gcal-managed: gcal
+:END:
+:org-gcal:
+<2025-08-21 木 15:00-15:30>
+
+前日にも予定もありました
+
+:END:
+
+* 来週の予定
+:PROPERTIES:
+:ETag: \"3234567890abcdef\"
+:LOCATION: Tokyo
+:calendar-id: foo@example.com
+:entry-id: y234567890abcdef/foo@example.com
+:org-gcal-managed: gcal
+:END:
+:org-gcal:
+<2025-08-30 木 15:00-15:30>
+
+来週にも予定あり
+
+:END:
+"))
+    (should (equal (ox-nippou--parse-gcal gcal-content "2025-08-22")
+                   '((:title "テスト予定" :todo "TODO" :category "会議など" :pull-request nil :document-url nil))))))
+
 (ert-deftest test-ox-nippou--parse-gcal-entry ()
   "Test the ox-nippou--parse-gcal function with a simple entry."
   (let* ((gcal-content "* テスト予定
