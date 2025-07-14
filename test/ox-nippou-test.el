@@ -76,6 +76,29 @@
     (should (equal (ox-nippou--parse-journal org-content)
                    '((:title "Task 2" :todo "DONE" :category nil :pull-request nil :document-url nil))))))
 
+(ert-deftest test-ox-nippou--parse-gcal-entry ()
+  "Test the ox-nippou--parse-gcal function with a simple entry."
+  (let* ((gcal-content "* テスト予定
+:PROPERTIES:
+:ETag: \"1234567890abcdef\"
+:LOCATION: Tokyo
+:calendar-id: foo@example.com
+:entry-id: 1234567890abcdef/foo@example.com
+:org-gcal-managed: gcal
+:END:
+:org-gcal:
+<2025-08-22 金 11:00-12:00>
+
+ここには予定の概要が出力されます
+
+:END:
+"))
+    (with-temp-buffer
+      (insert gcal-content)
+      (org-mode)
+      (let ((entry (org-element-parse-buffer)))
+        (should (equal (ox-nippou--parse-gcal-entry entry "2025-08-22")
+                       '(:title "テスト予定" :todo "TODO" :category "会議など" :pull-request nil :document-url nil)))))))
 
 (ert-deftest test-ox-nippou--categorize-tasks ()
   "Test the ox-nippou--categorize-tasks function with simple tasks."
