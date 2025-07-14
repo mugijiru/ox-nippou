@@ -112,6 +112,24 @@ This function returns a list of tasks with their titles and todo keywords."
                         children)))
       (seq-map #'ox-nippou--parse-journal-task filtered-children))))
 
+(defun ox-nippou--parse-gcal-entry (entry date-str)
+  "Parse a Google Calendar event by date"
+  (let* ((headline (org-element-map entry 'headline #'identity nil t))
+         (title (org-element-property :raw-value headline))
+         (todo-keyword (or (org-element-property :todo-keyword headline) "TODO"))
+         (gcal-drawer (org-element-map entry 'drawer
+                        (lambda (drawer)
+                          (when (string= (org-element-property :drawer-name drawer) "org-gcal")
+                            drawer))
+                        nil t))
+         (gcal-content (org-element-contents gcal-drawer))
+         (timestamp (org-element-map gcal-content 'timestamp #'identity nil t))
+         (day (org-element-property :day-start timestamp))
+         (month (org-element-property :month-start timestamp))
+         (year (org-element-property :year-start timestamp)))
+    (when (string= date-str (format "%04d-%02d-%02d" year month day))
+      (list :title title :todo todo-keyword :category "会議など" :pull-request nil :document-url nil))))
+
 (defun ox-nippou--categorize-tasks (tasks)
   "Categorize TASKS based on their todo state using `loop` macro.
 
