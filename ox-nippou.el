@@ -112,6 +112,18 @@ This function returns a list of tasks with their titles and todo keywords."
                         children)))
       (seq-map #'ox-nippou--parse-journal-task filtered-children))))
 
+(defun ox-nippou--parse-gcal (content &optional date-str)
+  "Parse Google Calendar events from CONTENT."
+  (with-temp-buffer
+    (insert content)
+    (org-mode)
+    (let* ((org-data (org-element-parse-buffer))
+           (date-str (or date-str (format-time-string "%Y-%m-%d" (current-time))))
+           (headlines (org-element-map org-data 'headline
+                        (lambda (headline)
+                          (ox-nippou--parse-gcal-entry headline date-str)))))
+      (seq-filter 'identity headlines))))
+
 (defun ox-nippou--parse-gcal-entry (entry date-str)
   "Parse a Google Calendar event by date"
   (let* ((headline (org-element-map entry 'headline #'identity nil t))
