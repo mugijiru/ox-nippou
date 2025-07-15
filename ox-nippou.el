@@ -54,6 +54,9 @@
 (defconst ox-nippou-journal-tasks-heading "Tasks"
   "Heading for tasks in the journal.")
 
+(defcustom ox-nippou-gcal-file nil
+  "File containing Google Calendar events in org format.")
+
 (defun ox-nippou--identify-journal-file (&optional date)
   "Find the journal org file for DATE."
   (let ((date (or date (current-time)))
@@ -112,6 +115,36 @@ This function returns a list of tasks with their titles and todo keywords."
                         children)))
       (seq-map #'ox-nippou--parse-journal-task filtered-children))))
 
+(defun ox-nippou--parse-gcal (content &optional date-str)
+  "Parse Google Calendar events from CONTENT."
+  (with-temp-buffer
+    (insert content)
+    (org-mode)
+    (let* ((org-data (org-element-parse-buffer))
+           (date-str (or date-str (format-time-string "%Y-%m-%d" (current-time))))
+           (headlines (org-element-map org-data 'headline
+                        (lambda (headline)
+                          (ox-nippou--parse-gcal-entry headline date-str)))))
+      (seq-filter 'identity headlines))))
+
+(defun ox-nippou--parse-gcal-entry (entry date-str)
+  "Parse a Google Calendar event by date"
+  (let* ((headline (org-element-map entry 'headline #'identity nil t))
+         (title (org-element-property :raw-value headline))
+         (todo-keyword (or (org-element-property :todo-keyword headline) "TODO"))
+         (gcal-drawer (org-element-map entry 'drawer
+                        (lambda (drawer)
+                          (when (string= (org-element-property :drawer-name drawer) "org-gcal")
+                            drawer))
+                        nil t))
+         (gcal-content (org-element-contents gcal-drawer))
+         (timestamp (org-element-map gcal-content 'timestamp #'identity nil t))
+         (day (org-element-property :day-start timestamp))
+         (month (org-element-property :month-start timestamp))
+         (year (org-element-property :year-start timestamp)))
+    (when (string= date-str (format "%04d-%02d-%02d" year month day))
+      (list :title title :todo todo-keyword :category "会議など" :pull-request nil :document-url nil))))
+
 (defun ox-nippou--categorize-tasks (tasks)
   "Categorize TASKS based on their todo state using `loop` macro.
 
@@ -119,18 +152,18 @@ This function returns a hash table where keys are todo states.
 "
   (let ((categorized-tasks (make-hash-table :test 'equal))
         (result))
-    (loop for task in tasks
-          for todo = (plist-get task :todo)
-          for state = (or (car (cl-rassoc todo ox-nippou-todo-state-mapping
-                                          :test (lambda (target journal-states)
-                                                  (seq-contains-p journal-states target))))
-                          "unknown")
-          do (puthash state
-                      (cons task (gethash state categorized-tasks))
-                      categorized-tasks))
-    (loop for state in (mapcar 'car ox-nippou-todo-state-mapping)
-          do (let ((tasks (gethash state categorized-tasks)))
-               (push (list state tasks) result)))
+    (cl-loop for task in tasks
+             for todo = (plist-get task :todo)
+             for state = (or (car (cl-rassoc todo ox-nippou-todo-state-mapping
+                                             :test (lambda (target journal-states)
+                                                     (seq-contains-p journal-states target))))
+                             "unknown")
+             do (puthash state
+                         (cons task (gethash state categorized-tasks))
+                         categorized-tasks))
+    (cl-loop for state in (mapcar 'car ox-nippou-todo-state-mapping)
+             do (let ((tasks (gethash state categorized-tasks)))
+                  (push (list state tasks) result)))
     (nreverse result)))
 
 (defun ox-nippou--generate-text-from-task (task)
@@ -176,7 +209,13 @@ This function returns a hash table where keys are todo states.
                         (insert-file-contents journal-file)
                         (buffer-string)))
          (tasks (ox-nippou--parse-journal org-content))
-         (categorized-tasks (ox-nippou--categorize-tasks tasks))
+         (schedules (when ox-nippou-gcal-file
+                      (ox-nippou--parse-gcal
+                       (with-temp-buffer
+                         (insert-file-contents ox-nippou-gcal-file)
+                         (buffer-string))
+                       (format-time-string "%Y-%m-%d" (or date (current-time))))))
+         (categorized-tasks (ox-nippou--categorize-tasks (append tasks schedules)))
          (nippou-content (ox-nippou--generate-nippou-content (nreverse categorized-tasks)))
          (buffer (get-buffer-create (concat "*Org export nippou* " (format-time-string "%Y-%m-%d" (or date (current-time)))))))
     (switch-to-buffer buffer)
