@@ -303,7 +303,7 @@
                               result)))))
 
 (ert-deftest test-ox-nippou-export-as-nippou ()
-  "Test the ox-nippou--parse-journal-task function with a simple headline."
+  "Test the ox-nippou-export-as-nippou function with a simple headline."
   (let ((org-todo-keywords '("TODO" "DOING" "|" "DONE"))
         (ox-nippou-journal-directory "/tmp")
         (ox-nippou-journal-file-format "%Y%m%d.org"))
