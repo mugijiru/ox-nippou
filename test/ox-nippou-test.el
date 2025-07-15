@@ -347,3 +347,52 @@
 
 - [ ] new task")))
       (kill-current-buffer))))
+
+(ert-deftest test-ox-nippou-export-as-nippou-with-gcal ()
+  "Test the ox-nippou--parse-gcal function with a simple headline."
+  (let ((gcal-content "* DONE テスト予定
+:PROPERTIES:
+:ETag: \"1234567890abcdef\"
+:LOCATION: Tokyo
+:calendar-id: foo@example.com
+:entry-id: 1234567890abcdef/foo@example.com
+:org-gcal-managed: gcal
+:END:
+:org-gcal:
+<2025-08-22 金 11:00-12:00>
+
+ここには予定の概要が出力されます
+
+:END:
+")
+        (ox-nippou-gcal-file "/tmp/gcal.org")
+        (journal-content "* 22日(金)
+** Tasks
+*** DONE completed task")
+        (ox-nippou-journal-directory "/tmp")
+        (ox-nippou-journal-file-format "%Y%m%d.org")
+        (ox-nippou-no-tasks-string "No Tasks"))
+    (with-temp-buffer
+      (insert gcal-content)
+      (write-region (point-min) (point-max) ox-nippou-gcal-file))
+    (with-temp-buffer
+      (insert journal-content)
+      (write-region (point-min) (point-max) "/tmp/20250822.org"))
+    (with-temp-buffer
+      (ox-nippou-export-as-nippou (encode-time 0 0 0 22 8 2025))
+      (text-mode)
+      (let ((nippou-content (buffer-substring-no-properties (point-min) (point-max))))
+        (should (string= nippou-content
+                         "# done
+
+- [x] 会議など: テスト予定
+- [x] completed task
+
+# doing
+
+- [ ] No Tasks
+
+# todo
+
+- [ ] No Tasks")))
+      (kill-current-buffer))))
