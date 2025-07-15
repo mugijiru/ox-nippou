@@ -209,7 +209,13 @@ This function returns a hash table where keys are todo states.
                         (insert-file-contents journal-file)
                         (buffer-string)))
          (tasks (ox-nippou--parse-journal org-content))
-         (categorized-tasks (ox-nippou--categorize-tasks tasks))
+         (schedules (when ox-nippou-gcal-file
+                      (ox-nippou--parse-gcal
+                       (with-temp-buffer
+                         (insert-file-contents ox-nippou-gcal-file)
+                         (buffer-string))
+                       (format-time-string "%Y-%m-%d" (or date (current-time))))))
+         (categorized-tasks (ox-nippou--categorize-tasks (append tasks schedules)))
          (nippou-content (ox-nippou--generate-nippou-content (nreverse categorized-tasks)))
          (buffer (get-buffer-create (concat "*Org export nippou* " (format-time-string "%Y-%m-%d" (or date (current-time)))))))
     (switch-to-buffer buffer)
