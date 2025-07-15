@@ -152,18 +152,18 @@ This function returns a hash table where keys are todo states.
 "
   (let ((categorized-tasks (make-hash-table :test 'equal))
         (result))
-    (loop for task in tasks
-          for todo = (plist-get task :todo)
-          for state = (or (car (cl-rassoc todo ox-nippou-todo-state-mapping
-                                          :test (lambda (target journal-states)
-                                                  (seq-contains-p journal-states target))))
-                          "unknown")
-          do (puthash state
-                      (cons task (gethash state categorized-tasks))
-                      categorized-tasks))
-    (loop for state in (mapcar 'car ox-nippou-todo-state-mapping)
-          do (let ((tasks (gethash state categorized-tasks)))
-               (push (list state tasks) result)))
+    (cl-loop for task in tasks
+             for todo = (plist-get task :todo)
+             for state = (or (car (cl-rassoc todo ox-nippou-todo-state-mapping
+                                             :test (lambda (target journal-states)
+                                                     (seq-contains-p journal-states target))))
+                             "unknown")
+             do (puthash state
+                         (cons task (gethash state categorized-tasks))
+                         categorized-tasks))
+    (cl-loop for state in (mapcar 'car ox-nippou-todo-state-mapping)
+             do (let ((tasks (gethash state categorized-tasks)))
+                  (push (list state tasks) result)))
     (nreverse result)))
 
 (defun ox-nippou--generate-text-from-task (task)
