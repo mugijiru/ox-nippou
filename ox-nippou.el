@@ -54,6 +54,9 @@
 (defconst ox-nippou-journal-tasks-heading "Tasks"
   "Heading for tasks in the journal.")
 
+(defcustom ox-nippou-gcal-file nil
+  "File containing Google Calendar events in org format.")
+
 (defun ox-nippou--identify-journal-file (&optional date)
   "Find the journal org file for DATE."
   (let ((date (or date (current-time)))
